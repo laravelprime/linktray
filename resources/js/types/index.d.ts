@@ -41,3 +41,24 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Tray {
+    created_at: string;
+    updated_at: string;
+    created_by: number;
+    description: string;
+    id: number;
+    is_private: number;
+    name: string
+    links: Link[]
+}
+
+export interface Link {
+    created_at: string;
+    updated_at: string;
+    id: number;
+    anchor_text: string;
+    favicon: string;
+    url: string;
+    tray_id: number;
+}

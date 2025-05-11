@@ -45,4 +45,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function trays() {
+        return $this->hasMany(Tray::class, 'created_by');
+    }
 }
