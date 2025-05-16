@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('tray_id');
+            $table->bigInteger('link_list_id');
             $table->text('url');
             $table->text('favicon')->nullable();
             $table->text('anchor_text')->nullable();
             $table->timestamps();
 
-            $table->foreign('tray_id')->references('id')->on('trays')->onDelete('cascade');
+            $table->foreign('link_list_id')->references('id')->on('link_lists')->onDelete('cascade');
         });
     }
 

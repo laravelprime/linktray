@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trays', function (Blueprint $table) {
+        Schema::create('link_lists', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('title');
             $table->text('description');
             $table->bigInteger('created_by');
-            $table->boolean('is_private')->default(true);
+            $table->enum('visibility', ['private', 'public'])->default('private');
             $table->timestamps();
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trays');
+        Schema::dropIfExists('link_lists');
     }
 };

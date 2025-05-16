@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Link;
-use App\Models\Tray;
+use App\Models\LinkList;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,13 +14,13 @@ class LinkSeeder extends Seeder
      */
     public function run(): void
     {
-        $trays = Tray::all();
+        $linkLists = LinkList::all();
 
         // Loop through each tray and create 20 links for each tray
-        foreach ($trays as $tray) {
+        foreach ($linkLists as $linkList) {
             Link::factory(20)->create([
-                'tray_id' => $tray->id,
-            ]);
+                'link_list_id' => $linkList->id,
+            ]);   
         }
     }
 }

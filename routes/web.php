@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TrayController;
+use App\Http\Controllers\LinkListController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,7 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::resource('link-trays', TrayController::class)
+Route::resource('link-lists', LinkListController::class)
     ->only('show', 'index')
     ->middleware('auth');
 

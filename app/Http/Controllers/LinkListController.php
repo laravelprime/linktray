@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tray;
+use App\Models\LinkList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class TrayController extends Controller
+class LinkListController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $trays = Auth::user()->trays->toArray();
-        return Inertia::render('trays/index/index', [
-            'trays' => $trays
+        $linkLists = Auth::user()->linkLists->toArray();
+        return Inertia::render('link-lists/index/index', [
+            'linkLists' => $linkLists
         ]);
     }
 
@@ -39,18 +39,18 @@ class TrayController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tray $linkTray)
+    public function show(LinkList $linkList)
     {
-        $linkTray->load('links');
+        $linkList->load('links');
         return Inertia::render('trays/show/show',[
-            'tray' => $linkTray
+            'tray' => $linkList
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tray $tray)
+    public function edit(LinkList $linkList)
     {
         //
     }
@@ -58,7 +58,7 @@ class TrayController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tray $tray)
+    public function update(Request $request, LinkList $linkList)
     {
         //
     }
@@ -66,7 +66,7 @@ class TrayController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tray $tray)
+    public function destroy(LinkList $linkList)
     {
         //
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tray>
  */
-class TrayFactory extends Factory
+class LinkListFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,10 +17,10 @@ class TrayFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->word,
+            'title' => $this->faker->word,
             'description' => $this->faker->sentence,
             'created_by' => \App\Models\User::first()->id,
-            'is_private' => $this->faker->boolean,
+            'visibility' => $this->faker->randomElement(['private', 'public']),
         ];
     }
 }

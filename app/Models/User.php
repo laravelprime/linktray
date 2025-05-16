@@ -46,7 +46,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function trays() {
-        return $this->hasMany(Tray::class, 'created_by');
+    public function linkLists() {
+        return $this->hasMany(LinkList::class, 'created_by');
     }
 }

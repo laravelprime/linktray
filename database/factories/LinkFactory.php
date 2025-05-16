@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Tray;
+use App\Models\LinkList;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,9 +18,9 @@ class LinkFactory extends Factory
     public function definition(): array
     {
         return [
-            'tray_id' => Tray::inRandomOrder()->first()->id,  // Random tray
+            'link_list_id' => LinkList::inRandomOrder()->first()->id,  // Random link list
             'url' => $this->faker->url,
-            'favicon' => $this->faker->url,
+            'favicon' => 'https://www.youtube.com/s/desktop/8da5389f/img/logos/favicon_144x144.png',
             'anchor_text' => $this->faker->sentence,
         ];
     }
