@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LinkList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class LinkListController extends Controller
@@ -33,7 +34,37 @@ class LinkListController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => [
+                'unique:link_lists,title',
+                'required',
+                'string',
+                'max:100',
+                'min:2',
+            ],
+            'description' => [
+                'required',
+                'nullable',
+                'string',
+                'min:2',
+                'max:1000',
+            ],
+            'visibility' => [
+                'required',
+                Rule::in(['public', 'private']), // Allow only predefined values
+            ],
+        ]);
+
+        $linkList = new LinkList([]);
+        $linkList->title = $validated['title'];
+        $linkList->description = $validated['description'];
+        $linkList->visibility = $validated['visibility'];
+        $linkList->created_by = Auth::user()->id;
+
+        $linkList->save();
+
+        $request->session()->flash('success', $validated['title'] . ' link list created successfully');
+        return to_route('link-lists.index');
     }
 
     /**
@@ -60,7 +91,38 @@ class LinkListController extends Controller
      */
     public function update(Request $request, LinkList $linkList)
     {
-        //
+        if(Auth::user()->id !== $linkList->created_by){
+            abort('403', "You're not authorized to edit this list");
+        }
+
+        $validated = $request->validate([
+            'title' => [
+                Rule::unique('link_lists')->ignore($linkList->id),
+                'required',
+                'string',
+                'max:100',
+                'min:2',
+            ],
+            'description' => [
+                'required',
+                'nullable',
+                'string',
+                'min:2',
+                'max:1000',
+            ],
+            'visibility' => [
+                'required',
+                Rule::in(['public', 'private']), // Allow only predefined values
+            ],
+        ]);
+
+        $linkList->title = $validated['title'];
+        $linkList->description = $validated['description'];
+        $linkList->visibility = $validated['visibility'];
+        $linkList->save();
+        
+        $request->session()->flash('success', $validated['title'] . ' link list updated successfully');
+        return to_route('link-lists.index');
     }
 
     /**
@@ -68,6 +130,13 @@ class LinkListController extends Controller
      */
     public function destroy(LinkList $linkList)
     {
-        //
+        if(Auth::user()->id !== $linkList->created_by){
+            abort('403', "You're not authorized to delete this list");
+        }
+
+        $linkList->delete();
+
+        request()->session()->flash('success', $linkList->title . ' link list deleted successfully');
+        return to_route('link-lists.index');
     }
 }

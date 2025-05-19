@@ -1,14 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { SharedData, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
-import { Tray } from "@/types"
+import { LinkList } from "@/types"
 import { EarthIcon, LockKeyhole, Plus } from 'lucide-react';
 
-import { TraysTable } from './trays-table';
+import { LinkListsTable } from './link-lists-table';
 import { columns } from "./columns"
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+
+import { usePage } from '@inertiajs/react';
 
 import {
     Dialog,
@@ -22,6 +24,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,22 +34,43 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const TrayIndex: React.FC<{ linkLists: Tray[]; }> = ({
+const LinkListsIndex: React.FC<{ linkLists: LinkList[]; }> = ({
     linkLists
 }) => {
-    console.log(linkLists);
-
-    const {data, setData} = useForm({
-        'name': '',
+    const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
+    const { flash } = usePage<SharedData>().props
+    
+    const {data, setData, post, processing, errors, reset} = useForm({
+        'title': '',
         'description': '',
         'visibility': 'private'
-    });    
+    });  
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { 
+        e.preventDefault();
+        post(route('link-lists.store'),{
+            onSuccess: () => {
+                setIsCreateListModalOpen(false)
+                reset()
+                if(flash.success){
+                    toast.success(flash.success)
+                }
+
+                if(flash.error){
+                    toast.error(flash.error)
+                }
+            }
+        });
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <Dialog>
+                <Dialog 
+                    open={isCreateListModalOpen} 
+                    onOpenChange={setIsCreateListModalOpen}
+                >
                     <div className='flex justify-end'>
                         <DialogTrigger
                             asChild 
@@ -60,14 +85,16 @@ const TrayIndex: React.FC<{ linkLists: Tray[]; }> = ({
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Create List</DialogTitle>
+                            <DialogDescription></DialogDescription>
                         </DialogHeader>
-                        <div className="flex flex-col gap-y-2">
+                        <form id='create-link-list-form' className="flex flex-col gap-y-2" onSubmit={handleSubmit}>
                             <div>
                                 <Input 
                                     placeholder="Title" 
-                                    value={data.name}
-                                    onChange={(e) => { setData('name', e.currentTarget.value) }}
+                                    value={data.title}
+                                    onChange={(e) => { setData('title', e.currentTarget.value) }}
                                 />
+                                {errors.title && <InputError message={errors.title}/>}
                             </div>
                             <div>
                                 <Textarea 
@@ -75,6 +102,7 @@ const TrayIndex: React.FC<{ linkLists: Tray[]; }> = ({
                                     value={data.description}
                                     onChange={(e) => { setData('description', e.currentTarget.value) }}
                                 />
+                                {errors.description && <InputError message={errors.description}/>}
                             </div>
                             <div>
                                 <Select
@@ -97,22 +125,22 @@ const TrayIndex: React.FC<{ linkLists: Tray[]; }> = ({
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {errors.visibility && <InputError message={errors.visibility}/>}
                             </div>
-                        </div>
+                        </form>
                         <DialogFooter>
                             <div className="flex justify-start w-full h-full">
-                                <Button onClick={() => { console.log('dasd');
-                                 }}>
-                                    Create {data.name}
+                                <Button type='submit' form='create-link-list-form' disabled={processing}>
+                                    Create {data.title}
                                 </Button>
                             </div>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-                <TraysTable columns={columns} data={trays}/>
+                <LinkListsTable columns={columns} data={linkLists}/>
             </div>
         </AppLayout>
     );
 }
 
-export default TrayIndex;
+export default LinkListsIndex;

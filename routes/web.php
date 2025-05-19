@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::resource('link-lists', LinkListController::class)
-    ->only('show', 'index')
+    ->only('show', 'index', 'store', 'update', 'destroy')
     ->middleware('auth');
 
 require __DIR__.'/settings.php';

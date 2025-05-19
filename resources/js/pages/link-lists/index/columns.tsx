@@ -27,24 +27,26 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { Link, useForm } from "@inertiajs/react"
-import { Tray } from "@/types"
+import { Link, useForm, usePage } from "@inertiajs/react"
+import { LinkList, SharedData } from "@/types"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import InputError from "@/components/input-error"
+import { toast } from "sonner"
 
-export const columns: ColumnDef<Tray>[] = [
+export const columns: ColumnDef<LinkList>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "title",
     header: () => <div className="font-bold">Title</div>,
     cell: ({ row }) => {
         return <Link 
           className="w-full h-full"
-          href={route('link-trays.show', row.original.id)}
+          href={route('link-lists.show', row.original.id)}
         >
           <Button variant="ghost" className="font-medium inline-flex justify-start items-center cursor-pointer w-full h-full">
             <FolderClosed size={'16px'}/>
-            {row.getValue('name')}        
+            {row.getValue('title')}        
           </Button>
         </Link>
     }
@@ -70,11 +72,15 @@ export const columns: ColumnDef<Tray>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const tray = row.original
- 
+      const linkList = row.original
+      const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
       const [openedDialog, setOpenedDialog] = useState<"delete" | "edit">();
+      
       return (
-        <Dialog>
+        <Dialog 
+          open={isDialogOpen} 
+          onOpenChange={setIsDialogOpen}
+        >
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -109,9 +115,9 @@ export const columns: ColumnDef<Tray>[] = [
           </DropdownMenu>
           <DialogContent>
             {openedDialog === "delete" ? (
-              <DeletePropertyModal />
+              <DeletePropertyModal linkList={linkList} setIsDialogOpen={setIsDialogOpen} />
             ) : (
-              <EditPropertyModal tray={tray} />
+              <EditPropertyModal linkList={linkList} setIsDialogOpen={setIsDialogOpen}/>
             )}
           </DialogContent>
         </Dialog>
@@ -120,7 +126,30 @@ export const columns: ColumnDef<Tray>[] = [
   },
 ]
 
-function DeletePropertyModal() {
+const DeletePropertyModal: React.FC<{
+  linkList: LinkList, 
+  setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+}> = ({linkList, setIsDialogOpen}) => {
+  const {delete: destroy} = useForm();
+  const { flash } = usePage<SharedData>().props
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    destroy(route('link-lists.destroy', linkList.id),{
+      onSuccess: () => {
+        if(flash.success){
+          toast.success(flash.success)
+        }
+
+        if(flash.error){
+          toast.error(flash.error)
+        }
+
+        setIsDialogOpen(false)
+      }
+    })
+  }
+  
   return (<>
     <DialogHeader>
       <DialogTitle>Are you absolutely sure?</DialogTitle>
@@ -130,36 +159,72 @@ function DeletePropertyModal() {
       </DialogDescription>
     </DialogHeader>
     <DialogFooter>
-      <div className="flex justify-start w-full h-full">
-        <Button variant='destructive'>
+      <form 
+        onSubmit={handleSubmit}
+        className="flex justify-start w-full h-full"
+      >
+        <Button type="submit" variant='destructive'>
           Delete Memes
         </Button>
-      </div>
+      </form>
     </DialogFooter>
   </>);
 }
 
 const EditPropertyModal: React.FC<{
-  tray: Tray
-}> = ({tray}) => {
-  const {} = useForm({});
+  linkList: LinkList, 
+  setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+}> = ({linkList, setIsDialogOpen}) => {
+  const { flash } = usePage<SharedData>().props
+  const {data, setData, patch, processing, errors, reset} = useForm({
+    'title': linkList.title,
+    'description': linkList.description,
+    'visibility': linkList.visibility
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    patch(route('link-lists.update', linkList.id),{
+      onSuccess: () => {
+        if(flash.success){
+          toast.success(flash.success)
+        }
+
+        if(flash.error){
+          toast.error(flash.error)
+        }
+
+        setIsDialogOpen(false)
+        reset();
+      }
+    })
+  }
 
   return (<>
     <DialogHeader>
       <DialogTitle>Edit List</DialogTitle>
+      <DialogDescription></DialogDescription>
     </DialogHeader>
-    <div className="flex flex-col gap-y-2">
+    <form
+      onSubmit={handleSubmit} 
+      className="flex flex-col gap-y-2"
+      id="edit-link-list-form"
+    >
       <div>
-        <Input placeholder="Title" value={tray.name}/>
+        <Input placeholder="Title" value={data.title} onChange={(e) => {setData('title', e.currentTarget.value)}}/>
+        {errors.title && <InputError message={errors.title}/>}
       </div>
       <div>
-        <Textarea placeholder="Description" value={tray.description}/>
+        <Textarea placeholder="Description" value={data.description} onChange={(e) => {setData('description', e.currentTarget.value)}}/>
+        {errors.description && <InputError message={errors.description}/>}
       </div>
       <div>
-      <Select
-        onValueChange={()=>{}} 
+      <Select 
+        onValueChange={(e)=>{
+          setData('visibility', e)
+        }}
         defaultValue="private"
-        value={tray.is_private ? 'private' : 'public'}
+        value={data.visibility}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Visibility" />
@@ -175,12 +240,13 @@ const EditPropertyModal: React.FC<{
           </SelectItem>
         </SelectContent>
       </Select>
+      {errors.visibility && <InputError message={errors.visibility}/>}
       </div>
-    </div>
+    </form>
     <DialogFooter>
       <div className="flex justify-start w-full h-full">
-        <Button>
-          Save
+        <Button type="submit" form="edit-link-list-form" disabled={processing}>
+          Save {data.title}
         </Button>
       </div>
     </DialogFooter>
