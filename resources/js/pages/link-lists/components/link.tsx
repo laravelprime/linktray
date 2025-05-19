@@ -17,11 +17,15 @@ import { EllipsisVertical } from "lucide-react"
 
 import TextLink from "@/components/text-link"
 
-export default function YoutubeLinkSmall({
+const WebLink : React.FC<{ 
+    favicon : string,
+    url : string,
+    anchor_text: string 
+}> = ({
     favicon,
     url,
     anchor_text
-}) {
+}) => {
     return <Card className='w-full pl-1 py-0'>
         <CardContent className='p-0.5'>
             <div className='flex items-center justify-between'>
@@ -64,3 +68,5 @@ export default function YoutubeLinkSmall({
         </CardContent>
     </Card>
 }
+
+export default WebLink;

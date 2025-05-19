@@ -2,7 +2,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 import YoutubeLink from './components/youtube-link';
-import YoutubeLinkSmall from './components/youtube-link-small';
+import YoutubeLinkSmall from './components/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 

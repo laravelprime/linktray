@@ -63,7 +63,7 @@ class LinkListController extends Controller
 
         $linkList->save();
 
-        $request->session()->flash('success', $validated['title'] . ' link list created successfully');
+        $request->session()->flash('success', $linkList->title . ' link list created successfully');
         return to_route('link-lists.index');
     }
 
@@ -72,9 +72,13 @@ class LinkListController extends Controller
      */
     public function show(LinkList $linkList)
     {
+        if(Auth::user()->id !== $linkList->created_by){
+            abort('403', "You're not authorized to view this list");
+        }
+
         $linkList->load('links');
-        return Inertia::render('trays/show/show',[
-            'tray' => $linkList
+        return Inertia::render('link-lists/show/index',[
+            'linkList' => $linkList
         ]);
     }
 
@@ -121,8 +125,15 @@ class LinkListController extends Controller
         $linkList->visibility = $validated['visibility'];
         $linkList->save();
         
-        $request->session()->flash('success', $validated['title'] . ' link list updated successfully');
-        return to_route('link-lists.index');
+        $request->session()->flash('success', $linkList->title . ' link list updated successfully');
+
+        $routeName = url()->previous();
+
+        if ($routeName === route('link-lists.show', $linkList->id)) {
+            return to_route('link-lists.show', $linkList->id);
+        } else {
+            return to_route('link-lists.index');
+        }
     }
 
     /**

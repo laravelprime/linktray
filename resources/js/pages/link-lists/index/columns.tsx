@@ -56,10 +56,10 @@ export const columns: ColumnDef<LinkList>[] = [
     header: () => <div className="font-bold">Description</div>,
   },
   {
-    accessorKey: "is_private",
+    accessorKey: "visibility",
     header: () => <div className="font-bold">Visibility</div>,
     cell: ({ row }) => {
-        const formatted = row.getValue('is_private') === 0 ? 
+        const formatted = row.getValue('visibility') === 'public' ? 
           (<div className="inline-flex items-center gap-x-2">
             <EarthIcon size={16}/> public
           </div>) : 
