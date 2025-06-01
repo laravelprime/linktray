@@ -61,5 +61,5 @@ export interface Link {
     anchor_text: string;
     favicon: string;
     url: string;
-    tray_id: number;
+    link_list_id: number;
 }

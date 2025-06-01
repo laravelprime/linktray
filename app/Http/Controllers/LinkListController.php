@@ -76,7 +76,9 @@ class LinkListController extends Controller
             abort('403', "You're not authorized to view this list");
         }
 
-        $linkList->load('links');
+        $linkList->load(['links' => function($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
         return Inertia::render('link-lists/show/index',[
             'linkList' => $linkList
         ]);
@@ -131,6 +133,8 @@ class LinkListController extends Controller
 
         if ($routeName === route('link-lists.show', $linkList->id)) {
             return to_route('link-lists.show', $linkList->id);
+        } else if ($routeName === route('public.link-lists.index', $linkList->id)) {
+            return to_route('public.link-lists.index', $linkList->id);
         } else {
             return to_route('link-lists.index');
         }

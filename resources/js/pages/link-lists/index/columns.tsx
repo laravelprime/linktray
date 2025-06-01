@@ -164,7 +164,7 @@ const DeletePropertyModal: React.FC<{
         className="flex justify-start w-full h-full"
       >
         <Button type="submit" variant='destructive'>
-          Delete Memes
+          Delete {linkList.title}
         </Button>
       </form>
     </DialogFooter>

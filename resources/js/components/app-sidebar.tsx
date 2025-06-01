@@ -9,7 +9,7 @@ import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Link Trays',
+        title: 'Link Lists',
         href: route('link-lists.index'),
         icon: LayoutGrid,
     }
