@@ -45,4 +45,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function linkLists() {
+        return $this->hasMany(LinkList::class, 'created_by');
+    }
 }

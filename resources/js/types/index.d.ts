@@ -26,6 +26,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash: {success: string; error: string};
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
     [key: string]: unknown;
@@ -40,4 +41,25 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface LinkList {
+    created_at: string;
+    updated_at: string;
+    created_by: number;
+    description: string;
+    id: number;
+    visibility: string;
+    title: string
+    links: Link[]
+}
+
+export interface Link {
+    created_at: string;
+    updated_at: string;
+    id: number;
+    anchor_text: string;
+    favicon: string;
+    url: string;
+    link_list_id: number;
 }
