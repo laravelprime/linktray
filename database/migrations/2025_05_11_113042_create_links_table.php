@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('link_list_id');
+            $table->unsignedBigInteger('link_list_id');
             $table->text('url');
             $table->text('favicon')->nullable();
             $table->text('anchor_text')->nullable();
