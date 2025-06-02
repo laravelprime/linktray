@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->bigInteger('created_by');
+            $table->unsignedBigInteger('created_by');
             $table->enum('visibility', ['private', 'public'])->default('private');
             $table->timestamps();
 
